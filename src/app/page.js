@@ -278,7 +278,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          Hello, I'm Devansh Mishra
+          Hello, I&apos;m Devansh
         </motion.h1>
         <motion.p
           className="text-lg text-gray-400"
@@ -309,7 +309,7 @@ export default function Home() {
           Overview
         </motion.h1>
         <motion.p className="pt-2 pb-6 w-[60vw]">
-          Hi, I'm Devansh Mishra — a passionate Full-Stack Web Developer with a deep interest in building scalable, interactive, and user-centric applications. I specialize in modern technologies like React.js, Next.js, Node.js, and MongoDB, with strong proficiency across the full stack.<br/>One of my most impactful projects is a real-time collaborative text editor, built using WebSockets for instant synchronization — showcasing my skills in full-duplex communication and performance optimization. I've also developed a Password Manager app adopted by 15+ instructors, reinforcing my focus on security and clean architecture.
+          Hi, I&apos;m Devansh Mishra — a passionate Full-Stack Web Developer with a deep interest in building scalable, interactive, and user-centric applications. I specialize in modern technologies like React.js, Next.js, Node.js, and MongoDB, with strong proficiency across the full stack.<br/>One of my most impactful projects is a real-time collaborative text editor, built using WebSockets for instant synchronization — showcasing my skills in full-duplex communication and performance optimization. I&apos;ve also developed a Password Manager app adopted by 15+ instructors, reinforcing my focus on security and clean architecture.
         </motion.p>
         <div ref={ref} className="mb-8 mt-10 flex gap-6 justify-center items-center">
           {skills.map((skill,i) => (
