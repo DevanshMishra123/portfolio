@@ -72,6 +72,7 @@ import Particles from "react-tsparticles";
 import { loadLinksPreset } from "tsparticles-preset-links";
 import ProfileCard from './components/ProfileCard/ProfileCard';
 import Threads from './components/Threads/Threads';
+import { Suspense } from 'react';
 
 const TriangularSphere = dynamic(() => import('./components/TriangularSphere'), {
   ssr: false, 
@@ -107,7 +108,9 @@ function AnimatedLaptop() {
       <ambientLight intensity={0.5} />
       <directionalLight position={[0, 0, 5]} />
       <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
-      <Laptop />
+      <Suspense fallback={null}>
+        <Laptop />
+      </Suspense>
       {/* <Sky
         distance={450000} 
         sunPosition={[100, 20, 100]}
@@ -294,7 +297,7 @@ export default function Home() {
             distance={0}
             enableMouseInteraction={true}
           />
-          <div className="absolute z-10 top-0 right-0 w-full h-full flex items-center justify-center">
+          <div className="absolute z-10 inset-0 flex items-center justify-center pointer-events-none">
             <AnimatedLaptop />
           </div>
         </div>
