@@ -57,7 +57,7 @@
 // }
 "use client"
 import Image from "next/image";
-import React, { use, useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
 import Link from "next/link";
@@ -68,8 +68,6 @@ import { meshBounds, OrbitControls, useGLTF, Points, PointMaterial, Line } from 
 import * as THREE from "three";
 import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
-import Particles from "react-tsparticles";
-import { loadLinksPreset } from "tsparticles-preset-links";
 import ProfileCard from './components/ProfileCard/ProfileCard';
 import Threads from './components/Threads/Threads';
 import { Suspense } from 'react';
@@ -78,148 +76,17 @@ const TriangularSphere = dynamic(() => import('./components/TriangularSphere'), 
   ssr: false, 
 });
 
-function Laptop() {
-  const modelRef = useRef();
-  const { scene } = useGLTF('/gamingPc.glb');
-  const [targetRotation, setTargetRotation] = useState(0)
+const AnimatedLaptop = dynamic(() => import ('./components/AnimatedLaptop'), {
+  ssr: false,
+})
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const rotation = scrollY * 0.002;
-      setTargetRotation(rotation);
-    }
+const EarthModel = dynamic(() => import ('./components/EarthModel'), {
+  ssr: false,
+})
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useFrame(() => {
-    if (modelRef.current) 
-      modelRef.current.rotation.y += (targetRotation - modelRef.current.rotation.y) * 0.1;
-  })
-
-  return <primitive ref={modelRef} object={scene} scale={4} />;
-}
-
-function AnimatedLaptop() {
-  return (
-    <Canvas style={{ height: '400px' }} camera={{ position: [8, 3, 0], fov: 45 }}>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[0, 0, 5]} />
-      <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
-      <Suspense fallback={null}>
-        <Laptop />
-      </Suspense>
-      {/* <Sky
-        distance={450000} 
-        sunPosition={[100, 20, 100]}
-        inclination={0}
-        azimuth={0.25}
-        mieCoefficient={0.005}
-        turbidity={10}
-        rayleigh={1}
-      /> */}
-      {/* <Stars radius={100} depth={50} count={5000} factor={4} fade speed={1} /> */}
-    </Canvas>
-  );
-}
-
-function EarthModel(){
-  const { scene } = useGLTF('/earth.glb')
-  return <primitive object={scene} scale={2.2} />
-}
-
-function NetworkOverlay({ count = 5000, radius = 2.2 }) {
-  const points = useMemo(() => {
-    const temp = [];
-    for (let i = 0; i < count; i++) {
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
-
-      const x = radius * Math.sin(phi) * Math.cos(theta);
-      const y = radius * Math.sin(phi) * Math.sin(theta);
-      const z = radius * Math.cos(phi);
-
-      temp.push(x, y, z);
-    }
-    return new Float32Array(temp);
-  }, [count, radius]);
-
-  return (
-    <>
-      <Points positions={points} stride={3}>
-        <PointMaterial
-          size={0.02}
-          color="violet"
-          sizeAttenuation
-          transparent
-          opacity={0.7}
-        />
-      </Points>
-      {/* Optionally draw lines between particles */}
-    </>
-  );
-}
-
-function ParticleLaptopSection() {
-  const particlesInit = async (engine) => {
-    await loadLinksPreset(engine);
-  };
-
-  return (
-    <div className="relative w-full h-[500px] overflow-hidden rounded-xl">
-      {/* 🎆 Particle Background */}
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        className="absolute inset-0 z-0"
-        options={{
-          preset: "links",
-          fullScreen: { enable: false },
-          background: { color: "transparent" },
-          particles: {
-            number: {
-              value: 100,
-            },
-            color: {
-              value: ["#d946ef", "#8b5cf6"], // Electric pink + purple
-            },
-            size: {
-              value: { min: 1, max: 3 },
-            },
-            interactivity: {
-              events: {
-                onHover: { enable: true, mode: "repulse" },
-                onClick: { enable: true, mode: "push" },
-              },
-            },
-            links: {
-              enable: true,
-              color: ["#ff4fdd", "#a78bfa"],
-              distance: 100,
-              width: 2,
-              opacity: 0.4,
-            },
-            size: { value: 1 },
-            move: {
-              enable: true,
-              speed: 1,
-            },
-            opacity: {
-              value: 0.5,
-            },
-          },
-        }}
-      />
-
-      {/* 💻 Animated Laptop */}
-      <div className="relative z-10 h-full flex items-center justify-center">
-        <AnimatedLaptop />
-      </div>
-    </div>
-  );
-}
+const NetworkOverlay = dynamic(() => import ('./components/NetworkOverlay'), {
+  ssr: false,
+})
 
 const boxVariants = {
   hidden: (i) => ({ x: -50 + i*40, opacity: 0 }),
@@ -402,14 +269,14 @@ export default function Home() {
           >
             <motion.div className="relative w-[20vw] h-[68vh] p-4 flex flex-col gap-6 bg-violet-950 rounded-xl overflow-hidden shadow-[0_0_20px_5px_#d8b4fe]">
               <Image alt="git-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" width={28} height={28} className="absolute z-10 top-52 right-4" />
-              <Link href='https://github.com/DevanshMishra123/text-editor.git' className="relative w-full h-[60%]">
+              <Link href='https://github.com/DevanshMishra123/my_projects.git' className="relative w-full h-[37vh]">
                 <Image alt="text-editor image" src="/password-mngr.png" fill className="object-cover rounded-md" />
               </Link>
               <motion.p>
-                Real-time collaborative text editor with live multi-user editing, color-coded cursors, Supabase auth, and auto-saving via WebSockets.
+                Built a secure password manager with encrypted data handling and user authentication, delivering a responsive, cross-platform UI to enhance usability and trust
               </motion.p>
               <div className="flex flex-wrap gap-2 mt-auto">
-                {["#React.js", "#Slate.js", "#Supabase", "#WebSockets"].map((tag) => (
+                {["#Next.js", "#MongoDb", "#Tailwind", "#NextAuth"].map((tag) => (
                   <span
                     key={tag}
                     className="text-[10px] bg-violet-800 text-white px-2 py-1 rounded-full"
@@ -433,14 +300,14 @@ export default function Home() {
           >
             <motion.div className="relative w-[20vw] h-[68vh] p-4 flex flex-col gap-6 bg-violet-950 rounded-xl overflow-hidden shadow-[0_0_20px_5px_#d8b4fe]">
               <Image alt="git-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" width={28} height={28} className="absolute z-10 top-52 right-4" />
-              <Link href='https://github.com/DevanshMishra123/text-editor.git' className="relative w-full h-[60%]">
+              <Link href='https://github.com/DevanshMishra123/project_4.git' className="relative w-full h-[37vh]">
                 <Image alt="text-editor image" src="/snk-game.png" fill className="object-cover rounded-md" />
               </Link>
               <motion.p>
-                Real-time collaborative text editor with live multi-user editing, color-coded cursors, Supabase auth, and auto-saving via WebSockets.
+                Built an interactive Snake game using React with smooth state management, responsive controls, and real-time rendering. Leveraged React Hooks to efficiently manage game logic.
               </motion.p>
               <div className="flex flex-wrap gap-2 mt-auto">
-                {["#React.js", "#Slate.js", "#Supabase", "#WebSockets"].map((tag) => (
+                {["#React.js", "Tailwind"].map((tag) => (
                   <span
                     key={tag}
                     className="text-[10px] bg-violet-800 text-white px-2 py-1 rounded-full"
@@ -464,14 +331,14 @@ export default function Home() {
           >
             <motion.div className="relative w-[20vw] h-[68vh] p-4 flex flex-col gap-6 bg-violet-950 rounded-xl overflow-hidden shadow-[0_0_20px_5px_#d8b4fe]">
               <Image alt="git-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" width={28} height={28} className="absolute z-10 top-52 right-4" />
-              <Link href='https://github.com/DevanshMishra123/text-editor.git' className="relative w-full h-[60%]">
-                <Image alt="text-editor image" src="/text-editor.png" fill className="object-cover rounded-md" />
+              <Link href='https://github.com/DevanshMishra123/project_2.git' className="relative w-full h-[37vh]">
+                <Image alt="text-editor image" src="/pathviz.png" fill className="object-cover rounded-md" />
               </Link>
               <motion.p>
-                Real-time collaborative text editor with live multi-user editing, color-coded cursors, Supabase auth, and auto-saving via WebSockets.
+                Engineered a real-time pathfinding visualizer using Dijkstra&apos;s algorithm to dynamically demonstrate shortest-path logic and improve algorithm comprehension.
               </motion.p>
               <div className="flex flex-wrap gap-2 mt-auto">
-                {["#React.js", "#Slate.js", "#Supabase", "#WebSockets"].map((tag) => (
+                {["#React.js", "#Tailwind"].map((tag) => (
                   <span
                     key={tag}
                     className="text-[10px] bg-violet-800 text-white px-2 py-1 rounded-full"
