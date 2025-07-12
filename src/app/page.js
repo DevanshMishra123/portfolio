@@ -151,9 +151,9 @@ export default function Home() {
             distance={0}
             enableMouseInteraction={true}
           />
-          {headInView&&<motion.div className="absolute z-10 inset-0 flex items-center justify-center pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, ease: "easeInOut" }}>   
+          <motion.div className="absolute z-10 inset-0 flex items-center justify-center pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>   
             {headInView&&<AnimatedLaptop />}
-          </motion.div>}
+          </motion.div>
         </div>
       </section>
 
@@ -205,7 +205,7 @@ export default function Home() {
         <motion.h1 className="text-6xl text-center font-bold py-4 my-4">
           Technologies
         </motion.h1>
-        {skillsInView&&<motion.div className="flex flex-wrap justify-center px-16 my-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, ease: "easeInOut" }}>
+        {skillsInView&&<motion.div className="flex flex-wrap justify-center px-16 my-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>
           {technologies.map((technology,i) => (
             <motion.div className="w-40 h-40" key={i}>
               <TriangularSphere technology={technology}/>
@@ -458,9 +458,9 @@ export default function Home() {
               </button>
             </form>
           </div>
-          {contactInView&&<motion.div className="flex-1 h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, ease: "easeInOut" }}>
+          <motion.div className="flex-1 h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>
             {contactInView&&<EarthModel />}
-          </motion.div>}
+          </motion.div>
         </motion.div>
         
         <motion.h2
