@@ -8,7 +8,7 @@ import * as THREE from "three";
 
 function Laptop() {
   const modelRef = useRef();
-  const { scene } = useGLTF('/gamingPc.glb');
+  const { scene } = useGLTF('/models/gamingPc.glb');
   const [targetRotation, setTargetRotation] = useState(0)
 
   useEffect(() => {
@@ -39,6 +39,7 @@ function AnimatedLaptop() {
       <Suspense fallback={null}>
         <Laptop />
       </Suspense>
+      <Laptop />
     </Canvas>
   );
 }

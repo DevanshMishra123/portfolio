@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, use } from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
 import Link from "next/link";
@@ -68,23 +68,67 @@ export default function Home() {
   const { ref, inView } = useInView({ threshold: 0.4 });
   const [hasAnimated, setHasAnimated] = useState(false);
 
+  const sectionRefs = {
+    head: useRef(null),
+    about: useRef(null),
+    skills: useRef(null),
+    projects: useRef(null),
+    contact: useRef(null),
+  };
+
+  const [inViewStates, setInViewStates] = useState({
+    head: false,
+    about: false,
+    skills: false,
+    projects: false,
+    contact: false,
+  });
+
+  const { ref: headRef, inView: headInView } = useInView({ threshold: 0.4 });
+  const { ref: aboutRef, inView: aboutInView } = useInView({ threshold: 0.4 });
+  const { ref: skillsRef, inView: skillsInView } = useInView({ threshold: 0.4 });
+  const { ref: projectsRef, inView: projectsInView } = useInView({ threshold: 0.4 });
+  const { ref: contactRef, inView: contactInView } = useInView({ threshold: 0.4 });
+
   useEffect(() => {
     if (inView) setHasAnimated(true);
   }, [inView]);
+
+  useEffect(() => {
+    setInViewStates((prev) => ({
+      ...prev,
+      head: headInView,
+      about: aboutInView,
+      skills: skillsInView,
+      projects: projectsInView,
+      contact: contactInView,
+    }));
+  }, [headInView, aboutInView, skillsInView, projectsInView, contactInView]);
+
+  const scrollToSection = (key) => {
+    sectionRefs[key]?.current?.scrollIntoView({ behavior: 'smooth' });
+  };
   
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       {/* Hero Section */}
       <div className="flex justify-between">
         <ul className="flex gap-4">
-          <li>About</li>
-          <li>Exerience</li>
-          <li>Skills</li>
-          <li>Contact</li>
+          <button onClick={() => scrollToSection('about')}>About</button>
+          <button onClick={() => scrollToSection('skills')}>Skills</button>
+          <button onClick={() => scrollToSection('projects')}>Projects</button>
+          <button onClick={() => scrollToSection('contact')}>Contact</button>
         </ul>
       </div>
       
-      <section className="py-16">
+      <section 
+        id="head" 
+        className="py-16"
+        ref={(el) => {
+          sectionRefs.head.current = el;
+          headRef(el);
+        }}
+      >
         <motion.h1
           className="text-6xl font-bold py-4"
           initial={{ opacity: 0, y: -50 }}
@@ -107,14 +151,20 @@ export default function Home() {
             distance={0}
             enableMouseInteraction={true}
           />
-          <div className="absolute z-10 inset-0 flex items-center justify-center pointer-events-none">
-            <AnimatedLaptop />
-          </div>
+          {headInView&&<motion.div className="absolute z-10 inset-0 flex items-center justify-center pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, ease: "easeInOut" }}>   
+            {headInView&&<AnimatedLaptop />}
+          </motion.div>}
         </div>
       </section>
 
       {/* About Section */}
-      <section>
+      <section 
+        id="about" 
+        ref={(el) => {
+          sectionRefs.about.current = el;
+          aboutRef(el);
+        }}
+      >
         <motion.h2 className="pt-6 pb-2 font-bold">
           INTRODUCTION
         </motion.h2>
@@ -144,21 +194,35 @@ export default function Home() {
       </section>
 
       {/* Skills Section */}
-      <section className="my-10">
+      <section 
+        id="skills" 
+        className="my-10"
+        ref={(el) => {
+          sectionRefs.skills.current = el;
+          skillsRef(el);
+        }}
+      >
         <motion.h1 className="text-6xl text-center font-bold py-4 my-4">
           Technologies
         </motion.h1>
-        <motion.div className="flex flex-wrap justify-center px-16 my-6">
+        {skillsInView&&<motion.div className="flex flex-wrap justify-center px-16 my-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, ease: "easeInOut" }}>
           {technologies.map((technology,i) => (
             <motion.div className="w-40 h-40" key={i}>
               <TriangularSphere technology={technology}/>
             </motion.div>         
           ))}
-        </motion.div>
+        </motion.div>}
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-8">
+      <section 
+        id="projects" 
+        className="py-8"
+        ref={(el) => {
+          sectionRefs.projects.current = el;
+          projectsRef(el);
+        }}
+      >
         <motion.h1
           className="text-6xl text-center font-bold py-4 my-4"
           initial={{ x: -100, opacity: 0 }}
@@ -323,7 +387,14 @@ export default function Home() {
       </section> */}
 
       {/* Contact Section */}
-      <section className="py-8 text-center">
+      <section 
+        id="contact" 
+        className="py-8 text-center"
+        ref={(el) => {
+          sectionRefs.contact.current = el;
+          contactRef(el);
+        }}
+      >
         <motion.div className="text-center items-center h-screen flex">
           {/* <ProfileCard
             name="Devansh Mishra"
@@ -387,15 +458,9 @@ export default function Home() {
               </button>
             </form>
           </div>
-          <div className="flex-1 h-full">
-            <Canvas>
-              <ambientLight />
-              <pointLight position={[10, 10, 10]} />
-              <EarthModel />         {/* Step 1 */}
-              {/* <NetworkOverlay />  */}
-              <OrbitControls enableZoom={false} />
-            </Canvas>
-          </div>
+          {contactInView&&<motion.div className="flex-1 h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, ease: "easeInOut" }}>
+            {contactInView&&<EarthModel />}
+          </motion.div>}
         </motion.div>
         
         <motion.h2

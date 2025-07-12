@@ -110,6 +110,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         ));
     }
 
+    for (int i = 0; i < u_line_count; i++) {
+        float p = float(i) / float(u_line_count);
+        line_strength *= (1.0 - lineFn(
+            uv,
+            u_line_width * pixel(1.0, iResolution.xy) * (1.0 - p),
+            p,
+            (PI * 2.0) * p,
+            uMouse + vec2(0.2, -0.1), // shifted mouse for offset
+            iTime + 100.0,
+            uAmplitude * 0.6,
+            uDistance + 0.1
+        ));
+    }
+
     float colorVal = 1.0 - line_strength;
     fragColor = vec4(uColor * colorVal, colorVal);
 }
