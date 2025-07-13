@@ -101,7 +101,7 @@ export default function Home() {
     e.preventDefault();
     setStatus('Sending...');
 
-    const res = await fetch('/api/contact', {
+    const res = await fetch('/api/sendMail', {
       method: 'POST',
       body: JSON.stringify(formData),
       headers: { 'Content-Type': 'application/json' },
