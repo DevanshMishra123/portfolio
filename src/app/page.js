@@ -90,6 +90,32 @@ export default function Home() {
   const { ref: projectsRef, inView: projectsInView } = useInView({ threshold: 0.4 });
   const { ref: contactRef, inView: contactInView } = useInView({ threshold: 0.4 });
 
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('');
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('Sending...');
+
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      setStatus('Message sent!');
+      setFormData({ name: '', email: '', message: '' });
+    } else {
+      setStatus('Failed to send.');
+    }
+  };
+
   useEffect(() => {
     if (inView) setHasAnimated(true);
   }, [inView]);
@@ -205,13 +231,15 @@ export default function Home() {
         <motion.h1 className="text-6xl text-center font-bold py-4 my-4">
           Technologies
         </motion.h1>
-        {skillsInView&&<motion.div className="flex flex-wrap justify-center px-16 my-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>
-          {technologies.map((technology,i) => (
-            <motion.div className="w-40 h-40" key={i}>
-              <TriangularSphere technology={technology}/>
-            </motion.div>         
-          ))}
-        </motion.div>}
+        <motion.div className="my-6 h-96 flex flex-col justify-center items-center">
+          {skillsInView&&<motion.div className="flex flex-wrap justify-center px-16" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>
+            {technologies.map((technology,i) => (
+              <motion.div className="w-40 h-40" key={i}>
+                <TriangularSphere technology={technology}/>
+              </motion.div>         
+            ))}
+          </motion.div>}
+        </motion.div>      
       </section>
 
       {/* Projects Section */}
@@ -395,7 +423,7 @@ export default function Home() {
           contactRef(el);
         }}
       >
-        <motion.div className="text-center items-center h-screen flex">
+        <motion.div className="text-center items-center h-screen flex pl-10">
           {/* <ProfileCard
             name="Devansh Mishra"
             title="Software Engineer"
@@ -406,8 +434,9 @@ export default function Home() {
             enableTilt={true}
             onContactClick={() => console.log('Contact clicked')}
           /> */}
-          <div className="bg-violet-950 rounded-2xl px-8 py-10 flex-1 shadow-xl max-w-xl w-full mx-auto text-white">
-            <form className="flex flex-col gap-8 w-full">
+          <div className="bg-violet-950 rounded-2xl px-8 py-10 flex-1 w-[50vw] shadow-xl max-w-xl mx-auto text-white">
+            <h1 className="text-6xl font-bold pt-6 pb-8">Get In Contact</h1>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-8 w-full">
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-semibold text-purple-200 text-left">
                   Name
@@ -418,6 +447,8 @@ export default function Home() {
                   name="name"
                   placeholder="What's your name?"
                   required
+                  value={formData.name}
+                  onChange={handleChange}
                   className="bg-violet-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-300"
                 />
               </div>
@@ -432,6 +463,8 @@ export default function Home() {
                   name="email"
                   placeholder="What's your email?"
                   required
+                  value={formData.email}
+                  onChange={handleChange}
                   className="bg-violet-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-300"
                 />
               </div>
@@ -446,6 +479,8 @@ export default function Home() {
                   placeholder="Write your message..."
                   required
                   rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
                   className="bg-violet-700 text-white px-4 py-2 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-300"
                 />
               </div>
@@ -457,6 +492,7 @@ export default function Home() {
                 Send Message
               </button>
             </form>
+            <p>{status}</p>
           </div>
           <motion.div className="flex-1 h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>
             {contactInView&&<EarthModel />}

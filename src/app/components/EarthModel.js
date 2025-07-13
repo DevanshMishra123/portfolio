@@ -14,7 +14,7 @@ function EarthModel(){
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
         <Suspense fallback={<div>Loading...</div>}>
-            <primitive object={scene} scale={2.2} /> 
+            <primitive object={scene} scale={1.8} /> 
         </Suspense>
         {/* <NetworkOverlay />  */}
         <OrbitControls enableZoom={false} />

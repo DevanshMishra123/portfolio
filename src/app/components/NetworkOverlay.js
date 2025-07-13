@@ -23,6 +23,7 @@ function NetworkOverlay({ count = 5000, radius = 2.2 }) {
 
   return (
     <>
+    <Canvas>
       <Points positions={points} stride={3}>
         <PointMaterial
           size={0.02}
@@ -32,6 +33,7 @@ function NetworkOverlay({ count = 5000, radius = 2.2 }) {
           opacity={0.7}
         />
       </Points>
+    </Canvas>
     </>
   );
 }
