@@ -25,10 +25,11 @@ export async function POST(req) {
   };
 
   try {
+    await transporter.verify(); 
     await transporter.sendMail(mailOptions);
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Failed to send email:', err);
-    return Response.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
