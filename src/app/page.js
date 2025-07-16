@@ -14,20 +14,16 @@ import dynamic from 'next/dynamic';
 import ProfileCard from './components/ProfileCard/ProfileCard';
 import Threads from './components/Threads/Threads';
 import { Suspense } from 'react';
+import "./globals.css"
+import Fox from "./components/Fox"
+import { useAlert } from "./useAlert";
+import Alert from "./components/Alert";
 
 const TriangularSphere = dynamic(() => import('./components/TriangularSphere'), {
   ssr: false, 
 });
 
 const AnimatedLaptop = dynamic(() => import ('./components/AnimatedLaptop'), {
-  ssr: false,
-})
-
-const EarthModel = dynamic(() => import ('./components/EarthModel'), {
-  ssr: false,
-})
-
-const NetworkOverlay = dynamic(() => import ('./components/NetworkOverlay'), {
   ssr: false,
 })
 
@@ -44,6 +40,25 @@ const boxVariants = {
   }),
 };
 
+const workBoxVariant = {
+  hidden: { x: 10, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      x: {
+        duration: 1,
+        ease: "easeOut",
+      },
+      opacity: {
+        duration: 0.5,
+        ease: "easeIn",
+      },
+    },
+  },
+}
+
+const nameArr = ['D','e','v','a','n','s','h',' ','M','i','s','h','r','a'];
 const skills = [{name: "Web Developer", img: "/web.png"}, {name: "React Developer", img: "/react.png"}, {name: "Backend Developer", img: "/backend.png"}, {name: "MERN Stack Developer", img: "/mern.png"}];
 const technologies = [
   "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
@@ -67,6 +82,8 @@ export default function Home() {
   const router = useRouter();
   const { ref, inView } = useInView({ threshold: 0.4 });
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [currentAnimation, setCurrentAnimation] = useState('walk')
+  const { alert, showAlert, hideAlert } = useAlert()
 
   const sectionRefs = {
     head: useRef(null),
@@ -74,6 +91,7 @@ export default function Home() {
     skills: useRef(null),
     projects: useRef(null),
     contact: useRef(null),
+    experience: useRef(null),
   };
 
   const [inViewStates, setInViewStates] = useState({
@@ -82,13 +100,30 @@ export default function Home() {
     skills: false,
     projects: false,
     contact: false,
+    experience: false,
   });
+
+  const [name, setName] = useState("");
+  useEffect(() => {
+    let i = 0
+    setInterval(() => {
+      if(i===nameArr.length){
+        i=0;
+        setName("");
+      }
+      else{
+        setName(prev => prev + nameArr[i])
+        i++; 
+      }
+    },200)
+  },[])
 
   const { ref: headRef, inView: headInView } = useInView({ threshold: 0.4 });
   const { ref: aboutRef, inView: aboutInView } = useInView({ threshold: 0.4 });
   const { ref: skillsRef, inView: skillsInView } = useInView({ threshold: 0.4 });
   const { ref: projectsRef, inView: projectsInView } = useInView({ threshold: 0.4 });
   const { ref: contactRef, inView: contactInView } = useInView({ threshold: 0.4 });
+  const { ref: experienceRef, inView: experienceInView } = useInView({ threshold: 0.4 });
 
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState('');
@@ -100,6 +135,7 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('Sending...');
+    setCurrentAnimation('hit');
 
     const res = await fetch('/api/sendMail', {
       method: 'POST',
@@ -110,11 +146,21 @@ export default function Home() {
     const data = await res.json();
     if (data.success) {
       setStatus('Message sent!');
-      setFormData({ name: '', email: '', message: '' });
+      showAlert({show: true, text: "Message sent successfully", type: "success"});  
+      setTimeout(() => {
+        hideAlert()
+        setCurrentAnimation('idle')
+        setFormData({ name: '', email: '', message: '' });
+      },[2000])   
     } else {
       setStatus('Failed to send.');
+      setCurrentAnimation('idle');
+      showAlert({show: true, text: "I didn't receive your message", type: "danger"});  
     }
   };
+
+  const handleBlur = () => setCurrentAnimation('walk')
+  const handleFocus = () => setCurrentAnimation('idle')
 
   useEffect(() => {
     if (inView) setHasAnimated(true);
@@ -142,10 +188,13 @@ export default function Home() {
         <ul className="flex gap-4">
           <button onClick={() => scrollToSection('about')}>About</button>
           <button onClick={() => scrollToSection('skills')}>Skills</button>
+          <button onClick={() => scrollToSection('experience')}>Experience</button>
           <button onClick={() => scrollToSection('projects')}>Projects</button>
           <button onClick={() => scrollToSection('contact')}>Contact</button>
         </ul>
       </div>
+
+      {alert.show&&<Alert {...alert} />}
       
       <section 
         id="head" 
@@ -161,7 +210,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          Hello, I&apos;m Devansh
+          Hello, I&apos;m <span className="font-bold bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(191,0,255,0.7)]">{name}</span><span className="bg-white w-[4px] h-14 inline-block animate-blink"></span>
         </motion.h1>
         <motion.p
           className="text-lg text-gray-400"
@@ -240,6 +289,38 @@ export default function Home() {
             ))}
           </motion.div>}
         </motion.div>      
+      </section>
+
+      {/* Work Experience */}
+      <section id="experience" ref={(el)=>{
+        sectionRefs.experience.current = el;
+        experienceRef(el);
+      }}
+      >
+        <motion.div className="flex h-[100vh] gap-8 px-44 relative">
+          <motion.div 
+            className="w-6 h-6 absolute rounded-full bg-violet-500 top-[40vh] left-42"></motion.div>
+          <motion.div className="bg-white w-[6px]">
+          </motion.div>
+          <motion.div 
+            className="bg-violet-950 flex flex-col justify-end gap-8 min-h-[60vh] w-[50vw] self-end p-12 border-4 border-violet-700"
+            initial="hidden"
+            animate={experienceInView ? "visible" : "hidden"}
+            variants={workBoxVariant}
+          >
+            <div className="flex justify-between">
+              <div>Web Development Intern at Digital Heroes - Remote</div>
+              <div>April 2025 - June 2025</div>
+            </div>
+            <ul className="list-disc pl-5 pt-4">
+              <li>Built and customized Shopify stores for clients across diverse industries, tailoring features to specific business needs.</li>
+              <li>Integrated third-party apps and configured Shopify themes to enhance store functionality and user experience.</li>
+              <li>Gained hands-on experience with Liquid templating language, collaborating closely with designers to implement responsive and user-friendly UI/UX.</li>
+              <li>Participated in requirement gathering sessions with clients and contributed to successful store deployment and post-launch support.</li>
+            </ul>
+            <hr className="bg-white"/>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Projects Section */}
@@ -423,7 +504,7 @@ export default function Home() {
           contactRef(el);
         }}
       >
-        <motion.div className="text-center items-center h-screen flex pl-10">
+        <motion.div className="text-center items-center h-screen flex pl-10 perspective-[1000px]">
           {/* <ProfileCard
             name="Devansh Mishra"
             title="Software Engineer"
@@ -434,9 +515,9 @@ export default function Home() {
             enableTilt={true}
             onContactClick={() => console.log('Contact clicked')}
           /> */}
-          <div className="bg-violet-950 rounded-2xl px-8 py-10 flex-1 w-[50vw] shadow-xl max-w-xl mx-auto text-white">
-            <h1 className="text-6xl font-bold pt-6 pb-8">Get In Contact</h1>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-8 w-full">
+          <div className="bg-violet-950 rounded-2xl px-8 py-10 flex-1 w-[50vw] shadow-xl max-w-xl mx-auto text-white transform-style: preserve-3d transition duration-[3s] ease-linear">
+            <h1 className="text-6xl font-bold pt-6 pb-8 transform-style: preserve-3d">Get In Contact</h1>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-8 w-full transform-style: preserve-3d">
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-semibold text-purple-200 text-left">
                   Name
@@ -492,10 +573,30 @@ export default function Home() {
                 Send Message
               </button>
             </form>
-            <p>{status}</p>
+            <p className="transform-style: preserve-3d">{status}</p>
           </div>
           <motion.div className="flex-1 h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 5, ease: "easeInOut" }}>
-            {contactInView&&<EarthModel />}
+            {/* {contactInView&&<EarthModel />} */}
+            <Canvas 
+              camera = {{
+                position : [0, 0, 5],
+                fov: 75,     
+                near: 0.1,
+                far: 1000     
+              }} 
+            >
+              <directionalLight intensity={2.5} position={[0, 0, 1]} />
+              <ambientLight intensity={0.5} />
+              <Suspense fallback={null}>
+                <Fox   
+                  position={[0.5, 0.35, 0]} 
+                  rotation={[12.6, -0.6, 0]}            
+                  scale = {[0.6, 0.6, 0.6]}
+                  currentAnimation={currentAnimation}
+                />  
+              </Suspense>
+              <OrbitControls enableZoom={false} enablePan={true} enableRotate={true} />
+            </Canvas>
           </motion.div>
         </motion.div>
         

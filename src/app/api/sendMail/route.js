@@ -3,6 +3,8 @@ import nodemailer from 'nodemailer';
 
 export async function POST(req) {
   const { name, email, message } = await req.json();
+  if(name==""||email==""||message=="")
+    return NextResponse.json({ success: false, error: err.message }, { status: 400 });
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
